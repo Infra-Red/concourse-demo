@@ -11,4 +11,4 @@ go get github.com/onsi/ginkgo/ginkgo
 go get github.com/onsi/gomega
 go get github.com/gorilla/mux
 
-ginkgo $GOPATH/src/github.com/Infra-Red/myawesomeapi/movie
+ginkgo $GOPATH/src/$PACKAGE_NAME/movie
