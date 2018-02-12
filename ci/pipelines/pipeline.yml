@@ -12,6 +12,18 @@ resources:
     repository: ((git-repo))
     access_token: ((git-token))
 
+- name: telegram-notification
+  type: telegram-notification
+  source:
+    bot_token: ((telegram-token))
+
+resource_types:
+- name: telegram-notification
+  type: docker-image
+  source:
+    repository: w32blaster/concourse-telegram-notifier
+    tag: latest
+
 jobs:
 - name: run-tests
   serial: true
@@ -22,6 +34,11 @@ jobs:
   - do:
     - task: run-tests
       file: git/ci/tasks/tests/task.yml
+    on_failure:
+      put: telegram-notification
+      params:
+        chat_id: ((telegram-chat))
+        text: "Build failed :fire:"
 
 - name: shipit
   serial: true
@@ -40,3 +57,13 @@ jobs:
         tag: github-release/tag
         body: github-release/body
         globs: [github-release/artifacts/*]
+    on_failure:
+      put: telegram-notification
+      params:
+        chat_id: ((telegram-chat))
+        text: "Build failed :fire:"
+    on_success:
+      put: telegram-notification
+      params:
+        chat_id: ((telegram-chat))
+        text: "Build ok :airplane:"
