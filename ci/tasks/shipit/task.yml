@@ -1,0 +1,17 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: golang
+    tag: '1.9'
+
+inputs:
+- name: git
+
+outputs:
+- name: github-release
+
+run:
+  path: ./git/ci/tasks/shipit/run.sh
