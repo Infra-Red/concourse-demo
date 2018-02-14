@@ -1,0 +1,17 @@
+resources:
+- name: git
+  type: git
+  source:
+    uri: ((git-uri))
+    branch: ((git-branch))
+
+jobs:
+- name: run-tests
+  serial: true
+  plan:
+  - aggregate:
+    - get: git
+      trigger: true
+  - do:
+    - task: run-tests
+      file: git/ci/tasks/tests/task.yml

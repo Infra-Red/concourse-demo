@@ -1,0 +1,42 @@
+resources:
+- name: git
+  type: git
+  source:
+    uri: ((git-uri))
+    branch: ((git-branch))
+
+- name: github
+  type: github-release
+  source:
+    user: ((git-user))
+    repository: ((git-repo))
+    access_token: ((git-token))
+
+jobs:
+- name: run-tests
+  serial: true
+  plan:
+  - aggregate:
+    - get: git
+      trigger: true
+  - do:
+    - task: run-tests
+      file: git/ci/tasks/tests/task.yml
+
+- name: shipit
+  serial: true
+  plan:
+  - aggregate:
+    - get: git
+      trigger: true
+      passed: [run-tests]
+  - do:
+    - task: prepare-release
+      file: git/ci/tasks/shipit/task.yml
+    - name: github-release
+      put: github
+      params:
+        name: github-release/name
+        tag: github-release/tag
+        body: github-release/body
+        globs: [github-release/artifacts/*]
